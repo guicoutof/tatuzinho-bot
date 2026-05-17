@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from discord_bot.config import DISCORD_BOT_TOKEN, API_BASE_URL
+from discord_bot.config import DISCORD_BOT_TOKEN, API_BASE_URL, PROXY_URL
 
 
 class TatuzinhoBot(commands.Bot):
@@ -22,5 +22,11 @@ if __name__ == "__main__":
     if not DISCORD_BOT_TOKEN:
         print("❌ DISCORD_BOT_TOKEN não configurado")
         exit(1)
+
     bot = TatuzinhoBot()
-    bot.run(DISCORD_BOT_TOKEN)
+
+    kwargs = {}
+    if PROXY_URL:
+        kwargs["proxy"] = PROXY_URL
+
+    bot.run(DISCORD_BOT_TOKEN, **kwargs)
