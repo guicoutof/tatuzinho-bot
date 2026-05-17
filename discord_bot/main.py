@@ -1,5 +1,7 @@
+import aiohttp
 import discord
 from discord.ext import commands
+from urllib.parse import urlparse
 
 from discord_bot.config import DISCORD_BOT_TOKEN, API_BASE_URL, PROXY_URL
 
@@ -7,7 +9,15 @@ from discord_bot.config import DISCORD_BOT_TOKEN, API_BASE_URL, PROXY_URL
 class TatuzinhoBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-        super().__init__(command_prefix="!", intents=intents)
+        kwargs = {}
+        if PROXY_URL:
+            kwargs["proxy"] = PROXY_URL
+            parsed = urlparse(PROXY_URL)
+            if parsed.username and parsed.password:
+                kwargs["proxy_auth"] = aiohttp.BasicAuth(
+                    parsed.username, parsed.password
+                )
+        super().__init__(command_prefix="!", intents=intents, **kwargs)
         self.api_base_url = API_BASE_URL
 
     async def setup_hook(self):
@@ -25,8 +35,4 @@ if __name__ == "__main__":
 
     bot = TatuzinhoBot()
 
-    kwargs = {}
-    if PROXY_URL:
-        kwargs["proxy"] = PROXY_URL
-
-    bot.run(DISCORD_BOT_TOKEN, **kwargs)
+    bot.run(DISCORD_BOT_TOKEN)
