@@ -1,4 +1,8 @@
+import asyncio
+import os
+
 import aiohttp
+from aiohttp import web
 import discord
 from discord.ext import commands
 from urllib.parse import urlparse
@@ -28,11 +32,28 @@ class TatuzinhoBot(commands.Bot):
         print(f"✅ Bot logado como {self.user}")
 
 
-if __name__ == "__main__":
+async def run_health_server():
+    app = web.Application()
+    app.router.add_get("/health", lambda r: web.Response(text="ok"))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", int(os.getenv("PORT", "8080")))
+    await site.start()
+    print(f"✅ Health server rodando na porta {os.getenv('PORT', '8080')}")
+    await asyncio.Event().wait()
+
+
+async def main():
     if not DISCORD_BOT_TOKEN:
         print("❌ DISCORD_BOT_TOKEN não configurado")
         exit(1)
 
     bot = TatuzinhoBot()
 
-    bot.run(DISCORD_BOT_TOKEN)
+    await asyncio.gather(
+        run_health_server(),
+        bot.start(DISCORD_BOT_TOKEN),
+    )
+
+
+asyncio.run(main())
