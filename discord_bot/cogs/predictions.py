@@ -44,55 +44,55 @@ class Predictions(commands.Cog):
 
                     data = await resp.json()
 
-            except (aiohttp.ClientError, ValueError) as e:
+                home_name = data["home_team"]
+                away_name = data["away_team"]
+                home_prob = data["home_win_probability"]
+                draw_prob = data["draw_probability"]
+                away_prob = data["away_win_probability"]
+                score = data["most_likely_score"]
+                confidence = data["confidence"]
+
+                embed = discord.Embed(
+                    title="⚽ Previsão da Partida",
+                    color=0x00FF00,
+                )
+                embed.add_field(name="🏠 Time da Casa", value=home_name, inline=True)
+                embed.add_field(name="✈️ Time Visitante", value=away_name, inline=True)
+                embed.add_blank_field(inline=False)
+
+                bar_home = _progress_bar(home_prob, 100)
+                bar_draw = _progress_bar(draw_prob, 100)
+                bar_away = _progress_bar(away_prob, 100)
+
+                probs = (
+                    f"🏠 **{home_name}**: {home_prob:.1f}%\n{bar_home}\n\n"
+                    f"🤝 **Empate**: {draw_prob:.1f}%\n{bar_draw}\n\n"
+                    f"✈️ **{away_name}**: {away_prob:.1f}%\n{bar_away}"
+                )
+                embed.add_field(name="📊 Probabilidades", value=probs, inline=False)
+                embed.add_blank_field(inline=False)
+
+                embed.add_field(
+                    name="🎯 Placar Mais Provável",
+                    value=f"**{score}**",
+                    inline=True,
+                )
+                embed.add_field(
+                    name="⚡ Confiança",
+                    value=f"{confidence:.1f}%",
+                    inline=True,
+                )
+
+                embed.set_footer(text="Tatuzinho — Football Analytics")
+                embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/54/54647.png")
+
+                await interaction.followup.send(embed=embed)
+
+            except (aiohttp.ClientError, ValueError, KeyError, TypeError) as e:
                 await interaction.followup.send(
-                    f"❌ Erro de conexão com a API: {str(e)}"
+                    f"❌ Erro ao processar a resposta da API: {str(e)}"
                 )
                 return
-
-        home_name = data["home_team"]
-        away_name = data["away_team"]
-        home_prob = data["home_win_probability"]
-        draw_prob = data["draw_probability"]
-        away_prob = data["away_win_probability"]
-        score = data["most_likely_score"]
-        confidence = data["confidence"]
-
-        embed = discord.Embed(
-            title="⚽ Previsão da Partida",
-            color=0x00FF00,
-        )
-        embed.add_field(name="🏠 Time da Casa", value=home_name, inline=True)
-        embed.add_field(name="✈️ Time Visitante", value=away_name, inline=True)
-        embed.add_blank_field(inline=False)
-
-        bar_home = _progress_bar(home_prob, 100)
-        bar_draw = _progress_bar(draw_prob, 100)
-        bar_away = _progress_bar(away_prob, 100)
-
-        probs = (
-            f"🏠 **{home_name}**: {home_prob:.1f}%\n{bar_home}\n\n"
-            f"🤝 **Empate**: {draw_prob:.1f}%\n{bar_draw}\n\n"
-            f"✈️ **{away_name}**: {away_prob:.1f}%\n{bar_away}"
-        )
-        embed.add_field(name="📊 Probabilidades", value=probs, inline=False)
-        embed.add_blank_field(inline=False)
-
-        embed.add_field(
-            name="🎯 Placar Mais Provável",
-            value=f"**{score}**",
-            inline=True,
-        )
-        embed.add_field(
-            name="⚡ Confiança",
-            value=f"{confidence:.1f}%",
-            inline=True,
-        )
-
-        embed.set_footer(text="Tatuzinho — Football Analytics")
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/54/54647.png")
-
-        await interaction.followup.send(embed=embed)
 
 
 def _progress_bar(value: float, max_value: float, width: int = 10) -> str:
