@@ -58,7 +58,7 @@ class Predictions(commands.Cog):
                 )
                 embed.add_field(name="🏠 Time da Casa", value=home_name, inline=True)
                 embed.add_field(name="✈️ Time Visitante", value=away_name, inline=True)
-                embed.add_blank_field(inline=False)
+                embed.add_field(name="\u200b", value="\u200b", inline=False)
 
                 bar_home = _progress_bar(home_prob, 100)
                 bar_draw = _progress_bar(draw_prob, 100)
@@ -70,7 +70,7 @@ class Predictions(commands.Cog):
                     f"✈️ **{away_name}**: {away_prob:.1f}%\n{bar_away}"
                 )
                 embed.add_field(name="📊 Probabilidades", value=probs, inline=False)
-                embed.add_blank_field(inline=False)
+                embed.add_field(name="\u200b", value="\u200b", inline=False)
 
                 embed.add_field(
                     name="🎯 Placar Mais Provável",
@@ -88,11 +88,16 @@ class Predictions(commands.Cog):
 
                 await interaction.followup.send(embed=embed)
 
-            except (aiohttp.ClientError, ValueError, KeyError, TypeError) as e:
+            except (aiohttp.ClientError, ValueError, KeyError, TypeError, AttributeError, discord.HTTPException) as e:
                 await interaction.followup.send(
-                    f"❌ Erro ao processar a resposta da API: {str(e)}"
+                    f"❌ Erro: {type(e).__name__}: {str(e)}"
                 )
                 return
+            except Exception as e:
+                try:
+                    await interaction.followup.send("❌ Erro inesperado. Verifique os logs.")
+                except Exception:
+                    pass
 
 
 def _progress_bar(value: float, max_value: float, width: int = 10) -> str:
