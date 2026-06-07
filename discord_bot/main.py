@@ -26,6 +26,7 @@ class TatuzinhoBot(commands.Bot):
 
     async def setup_hook(self):
         await self.load_extension("discord_bot.cogs.predictions")
+        await self.load_extension("discord_bot.cogs.teams")
         await self.tree.sync()
 
     async def on_ready(self):
