@@ -51,6 +51,7 @@ class Predictions(commands.Cog):
                 away_prob = data["away_win_probability"]
                 score = data["most_likely_score"]
                 confidence = data["confidence"]
+                over_25_prob = data["over_25_probability"]
 
                 embed = discord.Embed(
                     title="⚽ Previsão da Partida",
@@ -63,11 +64,13 @@ class Predictions(commands.Cog):
                 bar_home = _progress_bar(home_prob, 100)
                 bar_draw = _progress_bar(draw_prob, 100)
                 bar_away = _progress_bar(away_prob, 100)
+                bar_over25 = _progress_bar(over_25_prob, 100)
 
                 probs = (
                     f"🏠 **{home_name}**: {home_prob:.1f}%\n{bar_home}\n\n"
                     f"🤝 **Empate**: {draw_prob:.1f}%\n{bar_draw}\n\n"
-                    f"✈️ **{away_name}**: {away_prob:.1f}%\n{bar_away}"
+                    f"✈️ **{away_name}**: {away_prob:.1f}%\n{bar_away}\n\n"
+                    f"⚽ **Over 2.5**: {over_25_prob:.1f}%\n{bar_over25}"
                 )
                 embed.add_field(name="📊 Probabilidades", value=probs, inline=False)
                 embed.add_field(name="\u200b", value="\u200b", inline=False)
